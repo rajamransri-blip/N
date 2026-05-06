@@ -1,38 +1,39 @@
 const express = require('express');
 const cors = require('cors');
-const bodyParser = require('body-parser');
+const fs = require('fs');
+const path = require('path');
 
 const app = express();
 app.use(cors());
-app.use(bodyParser.json());
+app.use(express.json());
 
 const PORT = process.env.PORT || 3000;
-const ADMIN_SECRET = "raaz_admin_99"; // Admin login password
+const ADMIN_SECRET = "raaz_admin_99"; // Aapka Admin Password
 
 // ==========================================
-// 🧠 IN-MEMORY DATABASE (Live App State)
+// 🧠 1. IN-MEMORY DATABASE (Master State)
 // ==========================================
 let currentUiState = {
+    force_flash_to_memory: false,
     theme: {
         backgroundColor: "#050505",
         cardColor: "#1A1A1A",
-        glowColor: "#00FF41",
-        animationType: "slide_up"
+        glowColor: "#00FF41"
     },
-    prizePaths: [
+    tools: [
         {
-            id: "p1",
-            title: "PREMIUM CONFIG SETUP",
-            price: "₹199",
+            id: "bgmi_hack_1",
+            title: "EXECUTE SERVER BINARY",
+            badge: "POWER",
             imageUrl: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=600&auto=format&fit=crop",
-            action: "open_payment"
+            action: "execute_binary" // C++ engine isko read karke binary run karega
         },
         {
-            id: "p2",
-            title: "120 FPS OPTIMIZATION",
-            price: "₹299",
+            id: "vip_config",
+            title: "PREMIUM CONFIG SETUP",
+            badge: "₹199",
             imageUrl: "https://images.unsplash.com/photo-1542831371-29b0f74f9713?q=80&w=600&auto=format&fit=crop",
-            action: "open_payment"
+            action: "payment"
         }
     ]
 };
@@ -40,32 +41,50 @@ let currentUiState = {
 let paymentHistory = [];
 
 // ==========================================
-// 📱 ANDROID APP APIs (/api/...)
+// 📱 2. ANDROID APP APIs (Background Sync)
 // ==========================================
+
+// App khulte hi UI fetch karega
 app.get('/api/dynamic-ui', (req, res) => {
     res.json(currentUiState);
 });
 
+// User Payment detail submit karega
 app.post('/api/submit-payment', (req, res) => {
     const { gameId, utr, planId } = req.body;
     if(!utr || !gameId) {
         return res.status(400).json({ success: false, message: "Details Missing!" });
     }
     paymentHistory.push({ gameId, utr, planId, date: new Date().toLocaleString(), status: "PENDING" });
-    res.json({ success: true, message: "Payment Processing..." });
-});
-
-app.get('/api/check-update', (req, res) => {
-    res.json({ status: "success", latestVersion: "v2.1" });
+    res.json({ success: true, message: "Payment processing successfully!" });
 });
 
 // ==========================================
-// 💻 WEB ADMIN DASHBOARD (/admin)
+// ⚡ 3. BINARY FILE HOSTING SYSTEM (Master Feature)
 // ==========================================
+app.get('/api/download-binary', (req, res) => {
+    // Server par 'binaries' naam ka folder dhoondhega
+    const binaryFilePath = path.join(__dirname, 'binaries', 'bgmi_core.bin');
 
-// 1. Serve the Visual Web Page (UI for you)
+    // Agar aapne real file upload ki hai:
+    if (fs.existsSync(binaryFilePath)) {
+        console.log("-> App is downloading the REAL Binary file!");
+        res.download(binaryFilePath, 'bgmi_core.bin'); 
+    } 
+    // Agar real file nahi hai, toh crash hone ke bajaye ek Dummy Binary dega:
+    else {
+        console.log("-> Real binary missing, sending Dummy Safe Payload.");
+        const dummyBinaryContent = Buffer.from("7f454c46020101000000000000000000", "hex"); // Standard ELF Header
+        res.setHeader('Content-disposition', 'attachment; filename=bgmi_core.bin');
+        res.setHeader('Content-type', 'application/octet-stream');
+        res.send(dummyBinaryContent);
+    }
+});
+
+// ==========================================
+// 💻 4. WEB ADMIN DASHBOARD (/admin)
+// ==========================================
 app.get('/admin', (req, res) => {
-    // Injecting current JSON into the webpage
     const currentJsonString = JSON.stringify(currentUiState, null, 2);
     
     const htmlPage = `
@@ -97,10 +116,10 @@ app.get('/admin', (req, res) => {
             </div>
 
             <div class="box">
-                <h3>🛠️ Update Android App UI (JSON Editor)</h3>
-                <p>Edit the JSON below to change App Images, Prices, and Colors instantly.</p>
+                <h3>🛠️ Update Android App UI & Binary Triggers</h3>
+                <p>Edit JSON below. To force binary execution, set action to "execute_binary".</p>
                 <textarea id="uiJson">${currentJsonString}</textarea>
-                <button onclick="updateUi()">PUSH UPDATE TO APP ⚡</button>
+                <button onclick="updateUi()">PUSH MASSIVE UPDATE TO APP ⚡</button>
             </div>
 
             <div class="box">
@@ -111,7 +130,6 @@ app.get('/admin', (req, res) => {
         </div>
 
         <script>
-            // Function to push new UI to the server
             async function updateUi() {
                 const key = document.getElementById('adminKey').value;
                 const newUiText = document.getElementById('uiJson').value;
@@ -129,14 +147,10 @@ app.get('/admin', (req, res) => {
                 }
             }
 
-            // Function to fetch payments from the server
             async function fetchPayments() {
                 const key = document.getElementById('adminKey').value;
                 const res = await fetch('/admin/api/payments?adminKey=' + key);
-                if(res.status === 403) {
-                    alert("ACCESS DENIED: Wrong Password");
-                    return;
-                }
+                if(res.status === 403) { alert("ACCESS DENIED: Wrong Password"); return; }
                 const data = await res.json();
                 const listDiv = document.getElementById('paymentList');
                 listDiv.innerHTML = "";
@@ -158,13 +172,12 @@ app.get('/admin', (req, res) => {
     res.send(htmlPage);
 });
 
-// 2. Internal Admin APIs (Called by the Web Page above)
+// Admin Panel Internal APIs
 app.post('/admin/api/update-ui', (req, res) => {
     const { adminKey, newUi } = req.body;
     if (adminKey !== ADMIN_SECRET) return res.status(403).json({ success: false, message: "ACCESS DENIED" });
-    
     currentUiState = newUi;
-    res.json({ success: true, message: "✅ UI Updated for all Android users!" });
+    res.json({ success: true, message: "SYSTEM OVERRIDE: Update Pushed Successfully! ⚡" });
 });
 
 app.get('/admin/api/payments', (req, res) => {
@@ -174,7 +187,7 @@ app.get('/admin/api/payments', (req, res) => {
 });
 
 // ==========================================
-// 🚀 SERVER START
+// 🚀 5. START SERVER
 // ==========================================
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Master Server Online on Port ${PORT}`);
