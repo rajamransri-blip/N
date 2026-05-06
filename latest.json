@@ -1,15 +1,25 @@
 {
   "app_id": "com.raaz.premiumservice",
-  "latest_version_code": 2,
-  "latest_version_name": "1.1.0",
+  "latest_version_code": 3,
+  "latest_version_name": "2.0.0",
   "update_required": true,
-  "release_notes": "Added new dark mode UI and improved Render Node.js connection.",
-  "download_url": "https://github.com/rajamransri-blip/N/raw/refs/heads/main/app.zip",
+  "release_notes": "Super App Update: Added Multi-Engine Support (Home, Shop, Settings) with Premium Dark UI.",
+  "download_url": "https://github.com/rajamransri-blip/N/raw/refs/heads/main/modules.zip",
   "modules": [
     {
-      "name": "ui_engine",
-      "file": "0ce5a31af4e7f5167b45.wasm",
-      "checksum": "a1b2c3d4e5f6..." 
+      "name": "home_engine",
+      "file": "home.wasm",
+      "checksum": "auto-verify" 
+    },
+    {
+      "name": "product_engine",
+      "file": "product.wasm",
+      "checksum": "auto-verify" 
+    },
+    {
+      "name": "settings_engine",
+      "file": "settings.wasm",
+      "checksum": "auto-verify" 
     }
   ]
 }
