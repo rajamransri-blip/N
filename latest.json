@@ -5,7 +5,7 @@
   "update_required": true,
   "release_notes": "Added Pure Dark Theme, .sh Script Flasher via + Icon, and enhanced OTA engine security.",
   "download_url": "https://github.com/rajamransri-blip/N/raw/refs/heads/main/app.zip",
-  "modules": [
+  "app": [
     {
       "name": "home_engine",
       "file": "home.wasm",
