@@ -1,25 +1,25 @@
 {
   "app_id": "com.raaz.premiumservice",
-  "latest_version_code": 3,
-  "latest_version_name": "2.0.0",
+  "latest_version_code": 4,
+  "latest_version_name": "2.1.0",
   "update_required": true,
-  "release_notes": "Super App Update: Added Multi-Engine Support (Home, Shop, Settings) with Premium Dark UI.",
-  "download_url": "https://github.com/rajamransri-blip/N/raw/refs/heads/main/modules.zip",
+  "release_notes": "Added Pure Dark Theme, .sh Script Flasher via + Icon, and enhanced OTA engine security.",
+  "download_url": "https://github.com/rajamransri-blip/N/raw/refs/heads/main/app.zip",
   "modules": [
     {
       "name": "home_engine",
       "file": "home.wasm",
-      "checksum": "auto-verify" 
+      "checksum": "secure-hash-v1" 
     },
     {
-      "name": "product_engine",
-      "file": "product.wasm",
-      "checksum": "auto-verify" 
+      "name": "library_engine",
+      "file": "library.wasm",
+      "checksum": "secure-hash-v1" 
     },
     {
       "name": "settings_engine",
       "file": "settings.wasm",
-      "checksum": "auto-verify" 
+      "checksum": "secure-hash-v1" 
     }
   ]
 }
