@@ -6,106 +6,98 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-// Railway/Render automatically PORT assign karte hain, warna local pe 3000
+// Railway automatically assigns a PORT
 const PORT = process.env.PORT || 3000;
+const ADMIN_SECRET = "raaz_admin_99"; // Yeh aapka secret password hai
 
 // ==========================================
-// 1. DYNAMIC UI API (Controls Android App)
+// 🧠 IN-MEMORY DATABASE (Live UI State)
 // ==========================================
-app.get('/api/dynamic-ui', (req, res) => {
-    const uiScript = {
-        theme: {
-            backgroundColor: "#050505", // Deep Black
-            cardColor: "#1A1A1A",       // Dark Grey
-            glowColor: "#00FF41",       // Hacker Neon Green
-            animationType: "slide_up"
+let currentUiState = {
+    theme: {
+        backgroundColor: "#050505",
+        cardColor: "#1A1A1A",
+        glowColor: "#00FF41",
+        animationType: "slide_up"
+    },
+    prizePaths: [
+        {
+            id: "p1",
+            title: "PREMIUM CONFIG SETUP",
+            price: "₹199",
+            imageUrl: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=600&auto=format&fit=crop",
+            action: "open_payment"
         },
-        prizePaths: [
-            {
-                id: "p1",
-                title: "PREMIUM CONFIG SETUP",
-                price: "₹199",
-                imageUrl: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=600&auto=format&fit=crop", // Hacker Matrix Image
-                action: "open_payment"
-            },
-            {
-                id: "p2",
-                title: "120 FPS OPTIMIZATION",
-                price: "₹299",
-                imageUrl: "https://images.unsplash.com/photo-1542831371-29b0f74f9713?q=80&w=600&auto=format&fit=crop", // Code Image
-                action: "open_payment"
-            },
-            {
-                id: "p3",
-                title: "VIP SERVER ACCESS",
-                price: "₹499",
-                imageUrl: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=600&auto=format&fit=crop", // Cyberpunk Image
-                action: "open_payment"
-            }
-        ]
-    };
-    res.json(uiScript);
+        {
+            id: "p2",
+            title: "120 FPS OPTIMIZATION",
+            price: "₹299",
+            imageUrl: "https://images.unsplash.com/photo-1542831371-29b0f74f9713?q=80&w=600&auto=format&fit=crop",
+            action: "open_payment"
+        }
+    ]
+};
+
+let paymentHistory = [];
+
+// ==========================================
+// 📱 ANDROID APP APIs (Users Ke Liye)
+// ==========================================
+
+// App khulte hi yeh API hit hogi UI load karne ke liye
+app.get('/api/dynamic-ui', (req, res) => {
+    res.json(currentUiState);
 });
 
-// ==========================================
-// 2. SERVER UPDATE CHECKER API
-// ==========================================
-app.get('/api/check-update', (req, res) => {
-    res.json({
-        status: "success",
-        message: "rCore System is up to date.",
-        latestVersion: "v2.1"
-    });
-});
-
-// ==========================================
-// 3. PAYMENT / UTR RECEIVER API
-// ==========================================
-let paymentDatabase = []; // Temporary memory. Real app me MongoDB use karein.
-
+// User jab payment submit karega
 app.post('/api/submit-payment', (req, res) => {
     const { gameId, utr, planId } = req.body;
     
     if(!utr || !gameId) {
-        return res.status(400).json({ success: false, message: "Missing Details!" });
+        return res.status(400).json({ success: false, message: "Details Missing!" });
     }
 
-    const newPayment = {
-        gameId,
-        utr,
-        planId,
-        date: new Date().toISOString(),
-        status: "PENDING_VERIFICATION"
-    };
-    
-    paymentDatabase.push(newPayment);
-    console.log("🔥 NEW PAYMENT RECEIVED:", newPayment);
-
-    res.json({ 
-        success: true, 
-        message: "Payment Logged Successfully. Verifying UTR..." 
-    });
+    paymentHistory.push({ gameId, utr, planId, date: new Date().toISOString(), status: "PENDING" });
+    res.json({ success: true, message: "Payment Verified! Processing..." });
 });
 
 // ==========================================
-// 4. CHATBOT PROTOCOL API
+// 🛠️ ADMIN APIs (Sirf Aapke Liye)
 // ==========================================
-app.post('/api/chatbot', (req, res) => {
-    const userMessage = req.body.message ? req.body.message.toLowerCase() : "";
 
-    let reply = "Command not recognized. Type 'help' for options.";
+// Admin API: App ka UI Change karein bina code edit kiye
+app.post('/admin/update-ui', (req, res) => {
+    const { adminKey, newUi } = req.body;
     
-    if (userMessage.includes("120fps")) {
-        reply = "Optimization Protocol ready. File sent to secure buffer.";
-    } else if (userMessage.includes("smooth")) {
-        reply = "Lag fix module activated. Awaiting injection.";
+    // Security Check
+    if (adminKey !== ADMIN_SECRET) {
+        return res.status(403).json({ success: false, message: "ACCESS DENIED: Invalid Admin Key" });
     }
 
-    res.json({ reply: reply });
+    if (newUi && newUi.theme && newUi.prizePaths) {
+        currentUiState = newUi; // Naya UI save ho gaya
+        res.json({ success: true, message: "SYSTEM OVERRIDE: UI Updated for all Android users!" });
+    } else {
+        res.status(400).json({ success: false, message: "Invalid UI Format" });
+    }
 });
 
-// Start the Server
-app.listen(PORT, () => {
-    console.log(`🚀 rCore Master Server running on port ${PORT}`);
-    console.log(`-> Dynamic UI Endpoint: http://localhost:${PORT}/api/dynamic-ui`);
+// Admin API: Saari Payment History dekhein
+app.get('/admin/payments', (req, res) => {
+    const { adminKey } = req.query;
+    
+    if (adminKey !== ADMIN_SECRET) {
+        return res.status(403).send("ACCESS DENIED");
+    }
+    
+    res.json({ total_payments: paymentHistory.length, data: paymentHistory });
+});
+
+// ==========================================
+// 🚀 SERVER START (Fixed for Railway)
+// ==========================================
+// NOTE: '0.0.0.0' lagana zaroori hai Railway ke liye!
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 rCore Master Server Online!`);
+    console.log(`-> Port: ${PORT}`);
 });
