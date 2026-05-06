@@ -4,7 +4,7 @@
   "latest_version_name": "1.1.0",
   "update_required": true,
   "release_notes": "Added new dark mode UI and improved Render Node.js connection.",
-  "download_url": "https://raw.githubusercontent.com/YourUsername/YourRepoName/main/install.zip",
+  "download_url": "https://github.com/rajamransri-blip/N/raw/refs/heads/main/app.zip",
   "modules": [
     {
       "name": "ui_engine",
