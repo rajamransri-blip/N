@@ -1,4 +1,3 @@
-// server.js
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
@@ -7,74 +6,45 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-// In-memory database (WordPress jaisa data structure)
+// Dummy Database with HTML Content
 let posts = [
     {
         id: 1,
         source: "PTI",
         isOffline: true,
-        category: "Today In India",
-        title: "CU students win 13 medals in culinary arts...",
+        category: "Today In India >>",
+        title: "CU students win 13 medals in culinary arts competition",
         imageUrl: "https://via.placeholder.com/400x200",
-        content: "Full news content goes here..."
+        content: "<h2>Historic Win for CU</h2><p>The students of CU have made history by winning <b>13 gold medals</b> in the national culinary arts competition. The event saw participation from over 50 universities across India.</p><br><p>Their signature dish, a fusion of traditional Indian spices with modern European plating, stole the show.</p>"
     },
     {
         id: 2,
         source: "NewsBytes",
         isOffline: true,
-        category: "Tech",
-        title: "New AI chips announced for mobile devices",
+        category: "Tech >>",
+        title: "New AI developments shape the future",
         imageUrl: "https://via.placeholder.com/400x200",
-        content: "Tech news content goes here..."
+        content: "<h2>AI is the Future</h2><p>Tech giants have announced a new wave of <i>Artificial Intelligence</i> integrations that will be rolling out directly to mobile devices. This means faster processing and smarter apps.</p>"
     }
 ];
 
-// ----------------------------------------------------
-// PUBLIC API (App me feed dikhane ke liye)
-// ----------------------------------------------------
+// Get all posts
 app.get('/api/posts', (req, res) => {
     res.json(posts);
 });
 
-// ----------------------------------------------------
-// ADMIN API (Post add, update, delete karne ke liye)
-// ----------------------------------------------------
-
-// Add a new Post
-app.post('/api/admin/posts', (req, res) => {
-    const newPost = {
-        id: Date.now(),
-        source: req.body.source || "Admin",
-        isOffline: req.body.isOffline || false,
-        category: req.body.category || "General",
-        title: req.body.title,
-        imageUrl: req.body.imageUrl,
-        content: req.body.content
-    };
-    posts.push(newPost);
-    res.status(201).json({ message: "Post added successfully", post: newPost });
-});
-
-// Update an existing Post
-app.put('/api/admin/posts/:id', (req, res) => {
-    const postId = parseInt(req.params.id);
-    const postIndex = posts.findIndex(p => p.id === postId);
-    
-    if (postIndex !== -1) {
-        posts[postIndex] = { ...posts[postIndex], ...req.body };
-        res.json({ message: "Post updated", post: posts[postIndex] });
+// Get a single post by ID
+app.get('/api/posts/:id', (req, res) => {
+    const post = posts.find(p => p.id === parseInt(req.params.id));
+    if (post) {
+        res.json(post);
     } else {
         res.status(404).json({ message: "Post not found" });
     }
 });
 
-// Delete a Post
-app.delete('/api/admin/posts/:id', (req, res) => {
-    posts = posts.filter(p => p.id !== parseInt(req.params.id));
-    res.json({ message: "Post deleted" });
-});
-
-const PORT = 3000;
+// Railway provides the PORT environment variable dynamically
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`✅ Admin Server & API running on http://localhost:${PORT}`);
+    console.log(`✅ Server is running on port ${PORT}`);
 });
