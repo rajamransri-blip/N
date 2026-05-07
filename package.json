@@ -1,7 +1,7 @@
 {
-  "name": "rcore-backend",
+  "name": "glance-backend",
   "version": "1.0.0",
-  "description": "Server-Driven UI Backend for rCore App",
+  "description": "API for Glance App",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
