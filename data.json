@@ -1,0 +1,37 @@
+{
+  "maintenance_mode": false,
+  "maintenance_message": "Server upgrade under progress. Back in 30 mins!",
+  "app_version": 1,
+  "latest_version": 1,
+  "update_url": "https://github.com/your-profile/your-repo/releases",
+  "splash_logo": "🏆",
+  "splash_title": "BGMI TDM ARENA",
+  "onboarding": [
+    { "title": "Explore Custom Arenas", "desc": "Join premium competitive TDM battle rooms daily.", "graphic": "⚔️" },
+    { "title": "Direct Room Credentials", "desc": "Get Room ID and Password instantly inside the match card.", "graphic": "🔑" }
+  ],
+  "matches": [
+    {
+      "id": "1",
+      "title": "TDM WAREHOUSE - 4V4 ULTIMATE",
+      "time": "08:30 PM TODAY",
+      "prize": "₹500",
+      "fee": "FREE",
+      "slots": "5/8 Joined",
+      "room_id": "9842105",
+      "room_pass": "bgmi786",
+      "image_url": "https://raw.githubusercontent.com/your-profile/your-repo/main/warehouse_banner.jpg"
+    },
+    {
+      "id": "2",
+      "title": "TDM WAREHOUSE - STRIKER CLASH",
+      "time": "09:45 PM TODAY",
+      "prize": "₹1200",
+      "fee": "₹20",
+      "slots": "2/8 Joined",
+      "room_id": "7439102",
+      "room_pass": "tdm444",
+      "image_url": "https://raw.githubusercontent.com/your-profile/your-repo/main/striker_banner.jpg"
+    }
+  ]
+}
