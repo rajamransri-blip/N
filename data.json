@@ -1,27 +1,27 @@
 {
   "maintenance_mode": false,
-  "maintenance_message": "ð¨ Server under maintenance for 4v4 Tournament update. Back in 15 minutes!",
+  "maintenance_message": "Ã°ÂÂÂ¨ Server under maintenance for 4v4 Tournament update. Back in 15 minutes!",
   "app_version": 1,
   "latest_version": 1,
   "update_url": "https://github.com/",
-  "splash_logo": "ð",
+  "splash_logo": "Ã°ÂÂÂ",
   "splash_title": "SORRY ",
   "firebase_database_url": "https://bgmiuc-74295-default-rtdb.firebaseio.com/",
   "onboarding": [
     {
       "title": "Welcome to Arena Scrims",
       "desc": "Join competitive daily custom matches with top-tier players.",
-      "graphic": "âï¸"
+      "graphic": "Ã¢ÂÂÃ¯Â¸Â"
     },
     {
       "title": "Instant Room Access",
       "desc": "Get your custom Room ID and Password automatically inside the card as soon as you join.",
-      "graphic": "ð"
+      "graphic": "Ã°ÂÂÂ"
     },
     {
       "title": "Fair Play Guaranteed",
       "desc": "Strict active anti-cheat monitoring tools integrated for secure gaming experience.",
-      "graphic": "ð¡ï¸"
+      "graphic": "Ã°ÂÂÂ¡Ã¯Â¸Â"
     }
   ]
 }
