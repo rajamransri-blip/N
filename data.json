@@ -1,5 +1,5 @@
 {
-  "maintenance_mode": false,
+  "maintenance_mode": true,
   "maintenance_message": "Ã°ÂÂÂ¨ Server under maintenance for 4v4 Tournament update. Back in 15 minutes!",
   "app_version": 1,
   "latest_version": 1,
